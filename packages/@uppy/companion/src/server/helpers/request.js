@@ -1,83 +1,19 @@
+// eslint-disable-next-line max-classes-per-file
 const http = require('http')
 const https = require('https')
 const { URL } = require('url')
 const dns = require('dns')
-const ipAddress = require('ip-address')
 const request = require('request')
+const ipaddr = require('ipaddr.js')
+
 const logger = require('../logger')
 
 const FORBIDDEN_IP_ADDRESS = 'Forbidden IP address'
 
-function isIPAddress (address) {
-  const addressAsV6 = new ipAddress.Address6(address)
-  const addressAsV4 = new ipAddress.Address4(address)
-  return addressAsV6.isValid() || addressAsV4.isValid()
-}
-
-/* eslint-disable max-len */
-/**
- * Determine if a IP address provided is a private one.
- * Return TRUE if it's the case, FALSE otherwise.
- * Excerpt from:
- * https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html#case-2---application-can-send-requests-to-any-external-ip-address-or-domain-name
- *
- * @param {string} ipAddress the ip address to validate
- * @returns {boolean}
- */
-/* eslint-enable max-len */
-function isPrivateIP (ipAddress) {
-  let isPrivate = false
-  // Build the list of IP prefix for V4 and V6 addresses
-  const ipPrefix = []
-  // Add prefix for loopback addresses
-  ipPrefix.push('127.')
-  ipPrefix.push('0.')
-  // Add IP V4 prefix for private addresses
-  // See https://en.wikipedia.org/wiki/Private_network
-  ipPrefix.push('10.')
-  ipPrefix.push('172.16.')
-  ipPrefix.push('172.17.')
-  ipPrefix.push('172.18.')
-  ipPrefix.push('172.19.')
-  ipPrefix.push('172.20.')
-  ipPrefix.push('172.21.')
-  ipPrefix.push('172.22.')
-  ipPrefix.push('172.23.')
-  ipPrefix.push('172.24.')
-  ipPrefix.push('172.25.')
-  ipPrefix.push('172.26.')
-  ipPrefix.push('172.27.')
-  ipPrefix.push('172.28.')
-  ipPrefix.push('172.29.')
-  ipPrefix.push('172.30.')
-  ipPrefix.push('172.31.')
-  ipPrefix.push('192.168.')
-  ipPrefix.push('169.254.')
-  // Add IP V6 prefix for private addresses
-  // See https://en.wikipedia.org/wiki/Unique_local_address
-  // See https://en.wikipedia.org/wiki/Private_network
-  // See https://simpledns.com/private-ipv6
-  ipPrefix.push('fc')
-  ipPrefix.push('fd')
-  ipPrefix.push('fe')
-  ipPrefix.push('ff')
-  ipPrefix.push('::1')
-  // Verify the provided IP address
-  // Remove whitespace characters from the beginning/end of the string
-  // and convert it to lower case
-  // Lower case is for preventing any IPV6 case bypass using mixed case
-  // depending on the source used to get the IP address
-  const ipToVerify = ipAddress.trim().toLowerCase()
-  // Perform the check against the list of prefix
-  for (const prefix of ipPrefix) {
-    if (ipToVerify.startsWith(prefix)) {
-      isPrivate = true
-      break
-    }
-  }
-
-  return isPrivate
-}
+// Example scary IPs that should return false (ipv6-to-ipv4 mapped):
+// ::FFFF:127.0.0.1
+// ::ffff:7f00:1
+const isDisallowedIP = (ipAddress) => ipaddr.parse(ipAddress).range() !== 'unicast'
 
 module.exports.FORBIDDEN_IP_ADDRESS = FORBIDDEN_IP_ADDRESS
 
@@ -115,7 +51,7 @@ function dnsLookup (hostname, options, callback) {
 
     const toValidate = Array.isArray(addresses) ? addresses : [{ address: addresses }]
     for (const record of toValidate) {
-      if (isPrivateIP(record.address)) {
+      if (isDisallowedIP(record.address)) {
         callback(new Error(FORBIDDEN_IP_ADDRESS), addresses, maybeFamily)
         return
       }
@@ -127,7 +63,7 @@ function dnsLookup (hostname, options, callback) {
 
 class HttpAgent extends http.Agent {
   createConnection (options, callback) {
-    if (isIPAddress(options.host) && isPrivateIP(options.host)) {
+    if (ipaddr.isValid(options.host) && isDisallowedIP(options.host)) {
       callback(new Error(FORBIDDEN_IP_ADDRESS))
       return undefined
     }
@@ -138,7 +74,7 @@ class HttpAgent extends http.Agent {
 
 class HttpsAgent extends https.Agent {
   createConnection (options, callback) {
-    if (isIPAddress(options.host) && isPrivateIP(options.host)) {
+    if (ipaddr.isValid(options.host) && isDisallowedIP(options.host)) {
       callback(new Error(FORBIDDEN_IP_ADDRESS))
       return undefined
     }
@@ -166,13 +102,24 @@ module.exports.getProtectedHttpAgent = (protocol, blockPrivateIPs) => {
  *
  * @param {string} url
  * @param {boolean} blockLocalIPs
+ * @param {string} method
  * @returns {Promise<{type: string, size: number}>}
  */
-exports.getURLMeta = (url, blockLocalIPs = false) => {
+exports.getURLMeta = (url, blockLocalIPs = false, method = 'auto') => {
+  let tryGETOnFailure = false
+
+  // We prefer to use a HEAD request, as it doesn't download the content. If the URL doesn't
+  // support HEAD, or doesn't follow the spec and provide the correct Content-Length, we
+  // fallback to GET.
+  if (method === 'auto') {
+    method = 'HEAD'
+    tryGETOnFailure = true
+  }
+
   return new Promise((resolve, reject) => {
     const opts = {
       uri: url,
-      method: 'GET',
+      method: method,
       followRedirect: exports.getRedirectEvaluator(url, blockLocalIPs),
       agentClass: exports.getProtectedHttpAgent((new URL(url)).protocol, blockLocalIPs),
     }
@@ -181,6 +128,17 @@ exports.getURLMeta = (url, blockLocalIPs = false) => {
       if (err) reject(err)
     })
     req.on('response', (response) => {
+      // Can be undefined for unknown length URLs, e.g. transfer-encoding: chunked
+      const contentLength = parseInt(response.headers['content-length'], 10)
+
+      if (method === 'HEAD' && tryGETOnFailure) {
+        // We look for status codes in the 400 and 500 ranges here, as 3xx errors are unlikely to have to do with our choice of method
+        if (response.statusCode >= 400 || contentLength === 0 || isNaN(contentLength)) {
+          resolve(exports.getURLMeta(url, blockLocalIPs, 'GET'))
+          return
+        }
+      }
+
       if (response.statusCode >= 300) {
         // @todo possibly set a status code in the error object to get a more helpful
         // hint at what the cause of error is.
@@ -188,8 +146,6 @@ exports.getURLMeta = (url, blockLocalIPs = false) => {
       } else {
         req.abort() // No need to get the rest of the response, as we only want header
 
-        // Can be undefined for unknown length URLs, e.g. transfer-encoding: chunked
-        const contentLength = parseInt(response.headers['content-length'], 10)
         resolve({
           type: response.headers['content-type'],
           size: Number.isNaN(contentLength) ? null : contentLength,
