@@ -3,7 +3,8 @@ const tmp = require('tmp')
 const GrowingFile = require('growing-file')
 const youtubedl = require('youtube-dl-progress-improved')
 
-const TIMEOUT = 60 * 1000
+// Downloads can take a lonnnnnng time
+const TIMEOUT = 30 * 60 * 1000
 
 function streamFile(url) {
   return initDownload(url, false)
