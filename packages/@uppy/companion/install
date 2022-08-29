@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+YOUTUBE_DL_HOST="https://github.com/yt-dlp/yt-dlp/releases" npm install
