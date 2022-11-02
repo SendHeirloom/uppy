@@ -50,7 +50,7 @@ function initDownload(url, justMetadata) {
 
       output: tmpFile.name,
     }, {
-      timeout: justMetadata ? 10 * 1000 : TIMEOUT,
+      timeout: justMetadata ? 30 * 1000 : TIMEOUT,
     })
 
     Promise.allSettled([dl]).then(() => {
