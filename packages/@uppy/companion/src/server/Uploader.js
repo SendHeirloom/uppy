@@ -471,6 +471,7 @@ class Uploader {
     // chunkSize needs to be a finite value if the stream is not a file stream (fs.createReadStream)
     // https://github.com/tus/tus-js-client/blob/4479b78032937ac14da9b0542e489ac6fe7e0bc7/lib/node/fileReader.js#L50
     const chunkSize = this.options.chunkSize || (isFileStream ? Infinity : 50e6)
+    console.log('tus start', this.shortToken, this.uploadFileName, this.options.metadata.type)
 
     return new Promise((resolve, reject) => {
       this.tus = new tus.Upload(stream, {
@@ -511,14 +512,17 @@ class Uploader {
          * @param {number} [bytesTotal]
          */
         onProgress (bytesUploaded, bytesTotal) {
+          console.log('tus progress', uploader.shortToken, bytesUploaded, bytesTotal)
           uploader.onProgress(bytesUploaded, bytesTotal)
         },
         onSuccess () {
+          console.log('tus success', uploader.shortToken)
           resolve({ url: uploader.tus.url })
         },
       })
 
       if (!this._paused) {
+        console.log('ts')
         this.tus.start()
       }
     })

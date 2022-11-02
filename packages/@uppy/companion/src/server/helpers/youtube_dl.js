@@ -1,14 +1,14 @@
 const fs = require('fs')
 const tmp = require('tmp')
-const GrowingFile = require('growing-file')
 const youtubedl = require('youtube-dl-progress-improved')
+const Stream = require('stream')
 
 // Downloads can take a lonnnnnng time
 const TIMEOUT = 30 * 60 * 1000
 
 // How many similar size values do we need to get from YTDL before we believe it
 // YouTube DL has a tendency to grow the size value as it downloads.
-const CONSEC_SIZE_SAMPLES = 30
+const CONSEC_SIZE_SAMPLES = 3
 
 let SIZE_CACHE = {}
 
@@ -37,10 +37,6 @@ function getMetadata(url) {
 
 function initDownload(url, justMetadata) {
   const tmpFile = tmp.fileSync()
-  const stream = GrowingFile.open(tmpFile.name, {
-    timeout: TIMEOUT,
-    interval: 250,
-  })
 
   const promise = new Promise((resolve, reject) => {
     // TODO This method almost certainly doesn't work in situations where
@@ -68,20 +64,6 @@ function initDownload(url, justMetadata) {
       timeout: justMetadata ? 30 * 1000 : TIMEOUT,
     })
 
-    Promise.allSettled([dl]).then(() => {
-      // We want to stop the streaming, but there's no easy way to
-      // know if GrowingFile has reached the end of the file and can
-      // be destroyed, so we cheat and use the internal API.
-      stream._ended = true
-
-      // Just sort of guess when the last chunk will be done streaming. Even if it's
-      // not, as long as GrowingFile has a handle to the file this shouldn't
-      // do much:
-      setTimeout(() => {
-        fs.unlinkSync(tmpFile.name)
-      }, 1000)
-    })
-
     // If the client just wants metadata, we wait for the first
     // progress call, and resolve with that information.
     if (justMetadata) {
@@ -102,25 +84,27 @@ function initDownload(url, justMetadata) {
         if (value.percentage > 25 || consecSimilarSizes > CONSEC_SIZE_SAMPLES) {
           // It can take a while for YouTube DL to figure out the actual size
           dl.cancel()
-
+          fs.unlinkSync(tmpFile.name)
           resolve(value)
         }
-
-        return
       })
 
-      dl.catch((err) => {
-        if (!dl.cancelled) {
-          reject(err)
-        }
-      })
     } else {
-      resolve(dl)
+      dl.then(() => {
+        resolve(fs.createReadStream(tmpFile.name))
+
+        // fs.unlinkSync(tmpFile.name)
+      })
     }
+
+    dl.catch((err) => {
+      if (!dl.cancelled) {
+        reject(err)
+      }
+    })
   })
 
   return {
-    stream,
     promise,
   }
 }

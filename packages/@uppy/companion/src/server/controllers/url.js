@@ -77,15 +77,15 @@ const downloadURL = async (url, blockLocalIPs, traceId) => {
 
 const downloadWithYoutubeDL = async (url) => {
   return new Promise((resolve, reject) => {
-    const { stream, promise } = youtubedl.streamFile(url)
+    const { promise } = youtubedl.streamFile(url)
 
-    promise.then(() => {
+    promise.then((content) => {
       console.log("YouTubeDL: Download complete")
+      resolve(content)
     }, (e) => {
       console.log("YouTubeDL: Download failed", e)
+      reject()
     })
-
-    resolve(stream)
   })
 }
 
