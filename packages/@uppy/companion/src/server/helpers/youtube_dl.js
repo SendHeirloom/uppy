@@ -35,7 +35,7 @@ function initDownload(url, justMetadata) {
     // until it's done.
     console.log("YouTubeDL: Starting download", url, justMetadata ? 'for metadata' : '')
     const dl = youtubedl.download(url, {
-      format: 'worst[height >=? 480],worstvideo[height >=? 720][ext=mp4]+bestaudio[ext=m4a]',
+      format: 'worst[height >= 480],worstvideo[height >= 480][ext=mp4]+bestaudio[ext=m4a],best',
 
       // We stream the file as it's written, so it's nice when it only has one name
       noPart: true,
