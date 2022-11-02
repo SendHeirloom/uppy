@@ -99,7 +99,7 @@ function initDownload(url, justMetadata) {
           lastSize = value.totalSizeBytes
         }
 
-        if (consecSimilarSizes > CONSEC_SIZE_SAMPLES) {
+        if (value.percentage > 25 || consecSimilarSizes > CONSEC_SIZE_SAMPLES) {
           // It can take a while for YouTube DL to figure out the actual size
           dl.cancel()
 
