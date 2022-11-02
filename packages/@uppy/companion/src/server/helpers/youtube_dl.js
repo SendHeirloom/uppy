@@ -10,14 +10,25 @@ const TIMEOUT = 30 * 60 * 1000
 // YouTube DL has a tendency to grow the size value as it downloads.
 const CONSEC_SIZE_SAMPLES = 30
 
+let SIZE_CACHE = {}
+
 function streamFile(url) {
   return initDownload(url, false)
 }
 
 function getMetadata(url) {
+  if (SIZE_CACHE[url]) {
+    return Promise.resolve({size: SIZE_CACHE[url]})
+  }
+
   return initDownload(url, true)
     .promise
     .then((metadata) => {
+      if (Object.keys(SIZE_CACHE).length > 1000) {
+        SIZE_CACHE = {}
+      }
+      SIZE_CACHE[url] = metadata.totalSizeBytes
+
       return {
         size: metadata.totalSizeBytes,
       }
@@ -39,7 +50,7 @@ function initDownload(url, justMetadata) {
     // until it's done.
     console.log("YouTubeDL: Starting download", url, justMetadata ? 'for metadata' : '')
     const dl = youtubedl.download(url, {
-      format: 'worst[height >= 480],worstvideo[height >= 480][ext=mp4]+bestaudio[ext=m4a],best',
+      format: 'worst[height >= 480]/worstvideo[height >= 480][ext=mp4]+bestaudio[ext=m4a]/best',
 
       // We stream the file as it's written, so it's nice when it only has one name
       noPart: true,

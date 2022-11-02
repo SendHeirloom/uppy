@@ -136,7 +136,7 @@ const get = async (req, res) => {
   }
 
   async function download () {
-    return downloadWithYoutubeDL(req.body.url)//, !debug, req.id)
+    return downloadWithYoutubeDL(req.body.url)
   }
 
   function onUnhandledError (err) {
