@@ -6,6 +6,10 @@ const youtubedl = require('youtube-dl-progress-improved')
 // Downloads can take a lonnnnnng time
 const TIMEOUT = 30 * 60 * 1000
 
+// How many similar size values do we need to get from YTDL before we believe it
+// YouTube DL has a tendency to grow the size value as it downloads.
+const CONSEC_SIZE_SAMPLES = 30
+
 function streamFile(url) {
   return initDownload(url, false)
 }
@@ -70,10 +74,26 @@ function initDownload(url, justMetadata) {
     // If the client just wants metadata, we wait for the first
     // progress call, and resolve with that information.
     if (justMetadata) {
+      let consecSimilarSizes = 0
+      let lastSize = 0
       dl.progress((value) => {
-        dl.cancel()
+        if (dl.cancelled) {
+          return
+        }
 
-        resolve(value)
+        if (lastSize !== 0 && Math.abs((value.totalSizeBytes - lastSize) / lastSize) < 0.1) {
+          consecSimilarSizes++
+        } else {
+          consecSimilarSizes = 0
+          lastSize = value.totalSizeBytes
+        }
+
+        if (consecSimilarSizes > CONSEC_SIZE_SAMPLES) {
+          // It can take a while for YouTube DL to figure out the actual size
+          dl.cancel()
+
+          resolve(value)
+        }
 
         return
       })
