@@ -6,10 +6,6 @@ const Stream = require('stream')
 // Downloads can take a lonnnnnng time
 const TIMEOUT = 30 * 60 * 1000
 
-// How many similar size values do we need to get from YTDL before we believe it
-// YouTube DL has a tendency to grow the size value as it downloads.
-const CONSEC_SIZE_SAMPLES = 3
-
 let SIZE_CACHE = {}
 
 function streamFile(url) {
@@ -59,43 +55,18 @@ function initDownload(url, justMetadata) {
       noPlaylist: true,
       retries: 1,
 
-      output: tmpFile.name,
+      // https://github.com/yt-dlp/yt-dlp/issues/947#issuecomment-941702119
+      output: justMetadata ? '%(filesize,filesize_approx)s' : tmpFile.name,
     }, {
       timeout: justMetadata ? 30 * 1000 : TIMEOUT,
     })
 
-    // If the client just wants metadata, we wait for the first
-    // progress call, and resolve with that information.
-    if (justMetadata) {
-      let consecSimilarSizes = 0
-      let lastSize = 0
-      dl.progress((value) => {
-        if (dl.cancelled) {
-          return
-        }
+    dl.then((foo) => {
+      console.log(foo)
+      resolve(fs.createReadStream(tmpFile.name))
 
-        if (lastSize !== 0 && Math.abs((value.totalSizeBytes - lastSize) / lastSize) < 0.1) {
-          consecSimilarSizes++
-        } else {
-          consecSimilarSizes = 0
-          lastSize = value.totalSizeBytes
-        }
-
-        if (value.percentage > 25 || consecSimilarSizes > CONSEC_SIZE_SAMPLES) {
-          // It can take a while for YouTube DL to figure out the actual size
-          dl.cancel()
-          fs.unlinkSync(tmpFile.name)
-          resolve(value)
-        }
-      })
-
-    } else {
-      dl.then(() => {
-        resolve(fs.createReadStream(tmpFile.name))
-
-        // fs.unlinkSync(tmpFile.name)
-      })
-    }
+      // fs.unlinkSync(tmpFile.name)
+    })
 
     dl.catch((err) => {
       if (!dl.cancelled) {
