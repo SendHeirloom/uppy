@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const validator = require('validator')
 
 /**
  *
@@ -152,4 +153,27 @@ module.exports.requestStream = async (req, convertResponseToError) => {
   }
 
   return { stream: resp }
+}
+
+/**
+ * Validates that the download URL is secure
+ *
+ * @param {string} url the url to validate
+ * @param {boolean} debug whether the server is running in debug mode
+ */
+module.exports.validateURL = (url, debug) => {
+  if (!url) {
+    return false
+  }
+
+  const validURLOpts = {
+    protocols: ['http', 'https'],
+    require_protocol: true,
+    require_tld: !debug,
+  }
+  if (!validator.isURL(url, validURLOpts)) {
+    return false
+  }
+
+  return true
 }

@@ -1,35 +1,12 @@
 const router = require('express').Router
 const request = require('request')
 const { URL } = require('url')
-const validator = require('validator')
 
 const { startDownUpload } = require('../helpers/upload')
 const youtubedl = require('../helpers/youtube_dl')
 const { getURLMeta, getRedirectEvaluator, getProtectedHttpAgent } = require('../helpers/request')
 const logger = require('../logger')
-
-/**
- * Validates that the download URL is secure
- *
- * @param {string} url the url to validate
- * @param {boolean} debug whether the server is running in debug mode
- */
-const validateURL = (url, debug) => {
-  if (!url) {
-    return false
-  }
-
-  const validURLOpts = {
-    protocols: ['http', 'https'],
-    require_protocol: true,
-    require_tld: !debug,
-  }
-  if (!validator.isURL(url, validURLOpts)) {
-    return false
-  }
-
-  return true
-}
+const { validateURL } = require('../helpers/utils')
 
 /**
  * @callback downloadCallback
