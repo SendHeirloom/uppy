@@ -1,3 +1,5 @@
+const { statSync, createReadStream } = require('fs')
+const { join } = require('path')
 const logger = require('../logger')
 const youtubedl = require('../helpers/youtube_dl')
 const { validateURL } = require('../helpers/utils')
@@ -7,8 +9,8 @@ const { startDownUpload } = require('../helpers/upload')
  * @param {object} req
  * @param {object} res
  */
-async function youtube (req, res) {
-  logger.debug('YouTube route', null, req.id)
+async function download (req, res) {
+  logger.debug('YouTube download route', null, req.id)
 
   const { url } = req.body
   const { debug } = req.companion.options
@@ -19,16 +21,50 @@ async function youtube (req, res) {
     return
   }
 
+  const tmpPath = join(req.companion.options.filePath, `${req.id}.mp4`)
+
+  try {
+    await youtubedl.streamFile(url, tmpPath)
+  } catch (err) {
+    logger.error(err, 'controller.youtube.download.error', req.id)
+    res.status(500).json({ message: 'Failed to download video' })
+  }
+
+  res.json({ token: req.id })
+}
+
+/**
+ * @param {object} req
+ * @param {object} res
+ */
+async function upload (req, res) {
+  logger.debug('YouTube upload route', null, req.id)
+
+  const { token } = req.body
+  if (!token) {
+    logger.debug('Invalid request body detected.', null, req.id)
+    res.status(400).json({ error: 'Missing token' })
+    return
+  }
+
+  const tmpPath = join(req.companion.options.filePath, `${token}.mp4`)
+
   startDownUpload({
     req,
     res,
-    getSize: () => 0, // forces Uploader to download stream first
-    download: () => youtubedl.streamFile(url),
+    getSize: () => {
+      const { size } = statSync(tmpPath)
+      return size
+    },
+    download: () => createReadStream(tmpPath),
     onUnhandledError: err => {
-      logger.error(err, 'controller.youtube.error', req.id)
-      res.status(500).json({ message: 'Failed to download video' })
+      logger.error(err, 'controller.youtube.upload.error', req.id)
+      res.status(500).json({ message: 'Failed to upload video' })
     },
   })
 }
 
-module.exports = youtube
+module.exports = {
+  download,
+  upload,
+}
