@@ -23,14 +23,18 @@ async function download (req, res) {
 
   const tmpPath = join(req.companion.options.filePath, `${req.id}.mp4`)
 
+  let size = 0
   try {
     await youtubedl.streamFile(url, tmpPath)
+
+    const stats = statSync(tmpPath)
+    size = stats.size
   } catch (err) {
     logger.error(err, 'controller.youtube.download.error', req.id)
     res.status(500).json({ message: 'Failed to download video' })
   }
 
-  res.json({ token: req.id })
+  res.json({ token: req.id, size })
 }
 
 /**
