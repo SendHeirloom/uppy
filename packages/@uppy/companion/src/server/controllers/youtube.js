@@ -1,6 +1,10 @@
 const logger = require('../logger')
 const youtubedl = require('../helpers/youtube_dl')
 const { validateURL } = require('../helpers/utils')
+const { startDownUpload } = require('../helpers/upload')
+
+// size of 0 forces Uploader to download stream first
+const getSize = () => 0
 
 /**
  * @param {object} req
@@ -14,21 +18,21 @@ async function youtube (req, res) {
 
   if (!validateURL(url, debug)) {
     logger.debug('Invalid request body detected. Exiting url import handler.', null, req.id)
-    res.status(400).json({ error: 'Invalid request body' })
+    res.status(400).json({ error: 'Invalid URL' })
     return
   }
 
-  const { promise } = youtubedl.streamFile(url)
+  const onUnhandledError = err => {
+    logger.error(err, 'controller.youtube.error', req.id)
+    res.status(400).json({ message: 'Failed to download video' })
+  }
 
-  promise.then(content => {
-    logger.debug('YouTubeDL: Download complete', null, req.id)
+  const download = async () => {
+    const { promise } = youtubedl.streamFile(url)
+    return promise
+  }
 
-    // TODO: hook into startDownUpload?
-    res.send(content)
-  }, err => {
-    logger.error(err, 'YouTubeDL: Download failed.', null, req.id)
-    res.status(500).json({ error: 'Invalid request body' })
-  })
+  startDownUpload({ req, res, getSize, download, onUnhandledError })
 }
 
 module.exports = youtube
