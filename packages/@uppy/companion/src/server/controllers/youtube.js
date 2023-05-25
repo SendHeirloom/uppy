@@ -3,36 +3,32 @@ const youtubedl = require('../helpers/youtube_dl')
 const { validateURL } = require('../helpers/utils')
 const { startDownUpload } = require('../helpers/upload')
 
-// size of 0 forces Uploader to download stream first
-const getSize = () => 0
-
 /**
  * @param {object} req
  * @param {object} res
  */
 async function youtube (req, res) {
-  logger.debug('URL file import handler running', null, req.id)
+  logger.debug('YouTube route', null, req.id)
 
   const { url } = req.body
   const { debug } = req.companion.options
 
   if (!validateURL(url, debug)) {
-    logger.debug('Invalid request body detected. Exiting url import handler.', null, req.id)
+    logger.debug('Invalid request body detected.', null, req.id)
     res.status(400).json({ error: 'Invalid URL' })
     return
   }
 
-  const onUnhandledError = err => {
-    logger.error(err, 'controller.youtube.error', req.id)
-    res.status(400).json({ message: 'Failed to download video' })
-  }
-
-  const download = async () => {
-    const { promise } = youtubedl.streamFile(url)
-    return promise
-  }
-
-  startDownUpload({ req, res, getSize, download, onUnhandledError })
+  startDownUpload({
+    req,
+    res,
+    getSize: () => 0, // forces Uploader to download stream first
+    download: () => youtubedl.streamFile(url),
+    onUnhandledError: err => {
+      logger.error(err, 'controller.youtube.error', req.id)
+      res.status(500).json({ message: 'Failed to download video' })
+    },
+  })
 }
 
 module.exports = youtube
