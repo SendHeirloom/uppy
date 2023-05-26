@@ -5,6 +5,8 @@ const youtubedl = require('../helpers/youtube_dl')
 const { validateURL } = require('../helpers/utils')
 const { startDownUpload } = require('../helpers/upload')
 
+const FB_PERM_ERROR_REGEX = /\[facebook\].*registered users/
+
 /**
  * @param {object} req
  * @param {object} res
@@ -29,6 +31,11 @@ async function download (req, res) {
     const stats = statSync(tmpPath)
     size = stats.size
   } catch (err) {
+    if (err.message.match(FB_PERM_ERROR_REGEX)) {
+      res.json({ error: 'Video is private and cannot be accessed' })
+      return
+    }
+
     logger.error(err, 'controller.youtube.download.error', req.id)
     res.status(500).send('Failed to download video')
     return
