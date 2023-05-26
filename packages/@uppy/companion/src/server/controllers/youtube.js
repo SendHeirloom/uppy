@@ -16,8 +16,7 @@ async function download (req, res) {
   const { debug } = req.companion.options
 
   if (!validateURL(url, debug)) {
-    logger.debug('Invalid request body detected.', null, req.id)
-    res.status(400).json({ error: 'Invalid URL' })
+    res.json({ error: 'Invalid URL' })
     return
   }
 
@@ -31,7 +30,8 @@ async function download (req, res) {
     size = stats.size
   } catch (err) {
     logger.error(err, 'controller.youtube.download.error', req.id)
-    res.status(500).json({ message: 'Failed to download video' })
+    res.status(500).send('Failed to download video')
+    return
   }
 
   res.json({ token: req.id, size })
@@ -46,8 +46,7 @@ async function upload (req, res) {
 
   const { token } = req.body
   if (!token) {
-    logger.debug('Invalid request body detected.', null, req.id)
-    res.status(400).json({ error: 'Missing token' })
+    res.json({ error: 'Missing token' })
     return
   }
 
@@ -63,7 +62,7 @@ async function upload (req, res) {
     download: () => createReadStream(tmpPath),
     onUnhandledError: err => {
       logger.error(err, 'controller.youtube.upload.error', req.id)
-      res.status(500).json({ message: 'Failed to upload video' })
+      res.send('Failed to upload video')
     },
   })
 }
