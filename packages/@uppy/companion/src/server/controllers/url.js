@@ -1,35 +1,11 @@
 const router = require('express').Router
 const request = require('request')
 const { URL } = require('url')
-const validator = require('validator')
 
 const { startDownUpload } = require('../helpers/upload')
-const youtubedl = require('../helpers/youtube_dl')
 const { getURLMeta, getRedirectEvaluator, getProtectedHttpAgent } = require('../helpers/request')
 const logger = require('../logger')
-
-/**
- * Validates that the download URL is secure
- *
- * @param {string} url the url to validate
- * @param {boolean} debug whether the server is running in debug mode
- */
-const validateURL = (url, debug) => {
-  if (!url) {
-    return false
-  }
-
-  const validURLOpts = {
-    protocols: ['http', 'https'],
-    require_protocol: true,
-    require_tld: !debug,
-  }
-  if (!validator.isURL(url, validURLOpts)) {
-    return false
-  }
-
-  return true
-}
+const { validateURL } = require('../helpers/utils')
 
 /**
  * @callback downloadCallback
@@ -75,20 +51,6 @@ const downloadURL = async (url, blockLocalIPs, traceId) => {
   })
 }
 
-const downloadWithYoutubeDL = async (url) => {
-  return new Promise((resolve, reject) => {
-    const { promise } = youtubedl.streamFile(url)
-
-    promise.then((content) => {
-      console.log("YouTubeDL: Download complete")
-      resolve(content)
-    }, (e) => {
-      console.log("YouTubeDL: Download failed", e)
-      reject()
-    })
-  })
-}
-
 /**
  * Fteches the size and content type of a URL
  *
@@ -104,9 +66,8 @@ const meta = async (req, res) => {
       return res.status(400).json({ error: 'Invalid request body' })
     }
 
-    const { size } = await youtubedl.getMetadata(req.body.url)
-    // TODO: Figure out how to get the content type from YoutubeDL
-    return res.json({type: "video/mp4", size})
+    const urlMeta = await getURLMeta(req.body.url, !debug)
+    return res.json(urlMeta)
   } catch (err) {
     logger.error(err, 'controller.url.meta.error', req.id)
     // @todo send more meaningful error message and status code to client if possible
@@ -131,16 +92,15 @@ const get = async (req, res) => {
   }
 
   async function getSize () {
-    const { size } = await youtubedl.getMetadata(req.body.url)
+    const { size } = await getURLMeta(req.body.url, !debug)
     return size
   }
 
   async function download () {
-    return downloadWithYoutubeDL(req.body.url)
+    return downloadURL(req.body.url, !debug, req.id)
   }
 
   function onUnhandledError (err) {
-    console.log(err.stack)
     logger.error(err, 'controller.url.error', req.id)
     // @todo send more meaningful error message and status code to client if possible
     res.status(err.status || 500).json({ message: 'failed to fetch URL metadata' })
