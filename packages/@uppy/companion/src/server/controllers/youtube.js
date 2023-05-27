@@ -5,6 +5,7 @@ const youtubedl = require('../helpers/youtube_dl')
 const { validateURL } = require('../helpers/utils')
 const { startDownUpload } = require('../helpers/upload')
 
+const UNSUPPORTED_URL_ERROR_REGEX = /\[generic\].*Unsupported URL/s
 const FB_PERM_ERROR_REGEX = /\[facebook\].*registered users/
 
 /**
@@ -31,6 +32,11 @@ async function download (req, res) {
     const stats = statSync(tmpPath)
     size = stats.size
   } catch (err) {
+    if (err.message.match(UNSUPPORTED_URL_ERROR_REGEX)) {
+      res.json({ error: 'No video found on URL' })
+      return
+    }
+
     if (err.message.match(FB_PERM_ERROR_REGEX)) {
       res.json({ error: 'Video is private and cannot be accessed' })
       return
