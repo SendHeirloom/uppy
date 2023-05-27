@@ -8,11 +8,7 @@ const { startDownUpload } = require('../helpers/upload')
 const UNSUPPORTED_URL_ERROR_REGEX = /\[generic\].*Unsupported URL/s
 const FB_PERM_ERROR_REGEX = /\[facebook\].*registered users/
 
-/**
- * @param {object} req
- * @param {object} res
- */
-async function download (req, res) {
+const download = (isAudio) => async (req, res) => {
   logger.debug('YouTube download route', null, req.id)
 
   const { url } = req.body
@@ -23,11 +19,12 @@ async function download (req, res) {
     return
   }
 
-  const tmpPath = join(req.companion.options.filePath, `${req.id}.mp4`)
+  const ext = isAudio ? 'm4a' : 'mp4'
+  const tmpPath = join(req.companion.options.filePath, `${req.id}.${ext}`)
 
   let size = 0
   try {
-    await youtubedl.streamFile(url, tmpPath)
+    await youtubedl.streamFile(url, isAudio, tmpPath)
 
     const stats = statSync(tmpPath)
     size = stats.size
@@ -50,11 +47,7 @@ async function download (req, res) {
   res.json({ token: req.id, size })
 }
 
-/**
- * @param {object} req
- * @param {object} res
- */
-async function upload (req, res) {
+const upload = (isAudio) => (req, res) => {
   logger.debug('YouTube upload route', null, req.id)
 
   const { token } = req.body
@@ -63,7 +56,8 @@ async function upload (req, res) {
     return
   }
 
-  const tmpPath = join(req.companion.options.filePath, `${token}.mp4`)
+  const ext = isAudio ? 'm4a' : 'mp4'
+  const tmpPath = join(req.companion.options.filePath, `${token}.${ext}`)
 
   startDownUpload({
     req,
