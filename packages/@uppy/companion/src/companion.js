@@ -104,8 +104,10 @@ module.exports.app = (options = {}) => {
 
   // hooks directly into youtube-dl while avoiding Uppy's meta endpoints
   // previously, we tried to implement this w/in url controller but had tough to debug problems
-  app.post('/youtube/download', controllers.youtube.download)
-  app.post('/youtube/upload', controllers.youtube.upload)
+  app.post('/youtube/download', controllers.youtube.download(false))
+  app.post('/youtube/upload', controllers.youtube.upload(false))
+  app.post('/youtube/download/audio', controllers.youtube.download(true))
+  app.post('/youtube/upload/audio', controllers.youtube.upload(true))
 
   app.post('/:providerName/preauth', middlewares.hasSessionAndProvider, controllers.preauth)
   app.get('/:providerName/connect', middlewares.hasSessionAndProvider, controllers.connect)
