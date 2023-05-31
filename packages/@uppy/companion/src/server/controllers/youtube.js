@@ -1,4 +1,4 @@
-const { statSync, createReadStream, promises: { unlink } } = require('fs')
+const { statSync, createReadStream, promises: { unlink }, watch: fsWatch } = require('fs')
 const { join } = require('path')
 const logger = require('../logger')
 const youtubedl = require('../helpers/youtube_dl')
@@ -20,7 +20,15 @@ const download = (isAudio) => async (req, res) => {
     return
   }
 
+  const { filePath } = req.companion.options
+
+  // fs.watch is used to determine which output file yt-dlp is using;
+  // necessary since the filename is statically generated (see below).
   let filename = ''
+  const watcher = fsWatch(filePath, (_, _filename) => {
+    filename = _filename
+  })
+
   let size = 0
   try {
     // Files are temporarily stored using statically generated names.
@@ -31,11 +39,10 @@ const download = (isAudio) => async (req, res) => {
     // temporary file before the other user can do their upload stream
     // to the tusd server. This likely won't happen in practice and the
     // user would see an error and be able to retry successfully.
-    filename = await youtubedl.getFileName(url, isAudio)
+    const output = join(req.companion.options.filePath, '%(extractor)s-%(id)s.%(ext)s')
+    await youtubedl.streamFile(url, isAudio, output)
 
     const tmpPath = join(req.companion.options.filePath, filename)
-    await youtubedl.streamFile(url, isAudio, tmpPath)
-
     const stats = statSync(tmpPath)
     size = stats.size
   } catch (err) {
@@ -58,6 +65,8 @@ const download = (isAudio) => async (req, res) => {
     res.status(500).send('Failed to download video')
     return
   }
+
+  watcher.close()
 
   res.json({ token: filename, size })
 }
