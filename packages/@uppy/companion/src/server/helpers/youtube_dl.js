@@ -8,9 +8,6 @@ function streamFile (url, isAudio, output) {
     output,
     format: getFormat(isAudio),
 
-    // We stream the file as it's written, so it's nice when it only has one name
-    noPart: true,
-
     // Fixes 403s, as we are downloading from a different env than this
     noCacheDir: true,
     rmCacheDir: true,
