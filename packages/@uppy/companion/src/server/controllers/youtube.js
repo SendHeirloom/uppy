@@ -20,11 +20,20 @@ const download = (isAudio) => async (req, res) => {
     return
   }
 
-  const ext = isAudio ? 'm4a' : 'mp4'
-  const tmpPath = join(req.companion.options.filePath, `${req.id}.${ext}`)
-
+  let filename = ''
   let size = 0
   try {
+    // Files are temporarily stored using statically generated names.
+    // This allows for better cleanup if a network hiccup causes a user
+    // to call the download route twice and the upload route only once.
+    // Possible downside is the rare edge case that two users request
+    // same video at the same time and someone's upload deletes the shaerd
+    // temporary file before the other user can do their upload stream
+    // to the tusd server. This likely won't happen in practice and the
+    // user would see an error and be able to retry successfully.
+    filename = await youtubedl.getFileName(url, isAudio)
+
+    const tmpPath = join(req.companion.options.filePath, filename)
     await youtubedl.streamFile(url, isAudio, tmpPath)
 
     const stats = statSync(tmpPath)
@@ -50,10 +59,10 @@ const download = (isAudio) => async (req, res) => {
     return
   }
 
-  res.json({ token: req.id, size })
+  res.json({ token: filename, size })
 }
 
-const upload = (isAudio) => (req, res) => {
+const upload = (req, res) => {
   logger.debug('YouTube upload route', null, req.id)
 
   const { token } = req.body
@@ -62,8 +71,8 @@ const upload = (isAudio) => (req, res) => {
     return
   }
 
-  const ext = isAudio ? 'm4a' : 'mp4'
-  const tmpPath = join(req.companion.options.filePath, `${token}.${ext}`)
+  // isAudio not needed because "token" is a filename that includes extension
+  const tmpPath = join(req.companion.options.filePath, token)
 
   startDownUpload({
     req,
