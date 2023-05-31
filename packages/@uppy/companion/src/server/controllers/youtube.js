@@ -7,6 +7,7 @@ const { startDownUpload } = require('../helpers/upload')
 
 const UNSUPPORTED_URL_ERROR_REGEX = /\[generic\].*Unsupported URL/s
 const FB_PERM_ERROR_REGEX = /\[facebook\].*registered users/
+const YOUTUBE_UNAVAILABLE_REGEX = /\[youtube\].*Video unavailable/
 
 const download = (isAudio) => async (req, res) => {
   logger.debug('YouTube download route', null, req.id)
@@ -36,6 +37,11 @@ const download = (isAudio) => async (req, res) => {
 
     if (err.message.match(FB_PERM_ERROR_REGEX)) {
       res.json({ error: 'Video is private and cannot be accessed' })
+      return
+    }
+
+    if (err.message.match(YOUTUBE_UNAVAILABLE_REGEX)) {
+      res.json({ error: 'Video was not found or is no longer available' })
       return
     }
 
