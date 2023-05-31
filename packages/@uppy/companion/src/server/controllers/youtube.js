@@ -1,4 +1,4 @@
-const { statSync, createReadStream } = require('fs')
+const { statSync, createReadStream, promises: { unlink } } = require('fs')
 const { join } = require('path')
 const logger = require('../logger')
 const youtubedl = require('../helpers/youtube_dl')
@@ -73,6 +73,7 @@ const upload = (isAudio) => (req, res) => {
       return size
     },
     download: () => createReadStream(tmpPath),
+    cleanup: () => unlink(tmpPath).catch(() => {}),
     onUnhandledError: err => {
       logger.error(err, 'controller.youtube.upload.error', req.id)
       res.send('Failed to upload video')
