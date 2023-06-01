@@ -65,14 +65,16 @@ class Uploader {
    * @property {number} [chunkSize]
    *
    * @param {UploaderOptions} options
+   * @param {Function} [cleanup]
    */
-  constructor (options) {
+  constructor (options, cleanup = undefined) {
     if (!this.validateOptions(options)) {
       logger.debug(this._errRespMessage, 'uploader.validator.fail')
       return
     }
 
     this.options = options
+    this.cleanup = cleanup
     this.token = uuid.v4()
     this.fileName = `${Uploader.FILE_NAME_PREFIX}-${this.token}`
     this.options.metadata = this.options.metadata || {}
@@ -358,6 +360,7 @@ class Uploader {
     if (this.readStream && !this.readStream.destroyed) this.readStream.destroy()
 
     if (this.tmpPath) unlink(this.tmpPath).catch(() => {})
+    if (this.cleanup) this.cleanup()
 
     emitter().removeAllListeners(`pause:${this.token}`)
     emitter().removeAllListeners(`resume:${this.token}`)

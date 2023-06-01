@@ -2,12 +2,12 @@ const Uploader = require('../Uploader')
 const logger = require('../logger')
 const { errorToResponse } = require('../provider/error')
 
-async function startDownUpload ({ req, res, getSize, download, onUnhandledError }) {
+async function startDownUpload ({ req, res, getSize, download, cleanup, onUnhandledError }) {
   try {
     const size = await getSize()
 
     logger.debug('Instantiating uploader.', null, req.id)
-    const uploader = new Uploader(Uploader.reqToOptions(req, size))
+    const uploader = new Uploader(Uploader.reqToOptions(req, size), cleanup)
 
     if (uploader.hasError()) {
       const response = uploader.getResponse()

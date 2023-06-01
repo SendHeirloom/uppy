@@ -106,7 +106,12 @@ const get = async (req, res) => {
     res.status(err.status || 500).json({ message: 'failed to fetch URL metadata' })
   }
 
-  startDownUpload({ req, res, getSize, download, onUnhandledError })
+  function cleanup () {
+    // not necessary since file is only created, if necessary, w/in startDownUpload
+    // it can cleanup after itself; this is necssary for the youtube controller
+  }
+
+  startDownUpload({ req, res, getSize, download, cleanup, onUnhandledError })
 }
 
 module.exports = () => router()

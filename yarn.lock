@@ -8095,6 +8095,7 @@ __metadata:
     express-request-id: 1.4.1
     express-session: 1.17.1
     grant: 4.7.0
+    growing-file: ^0.1.3
     helmet: ^4.6.0
     into-stream: ^6.0.0
     ipaddr.js: ^2.0.1
@@ -8117,11 +8118,13 @@ __metadata:
     serialize-error: ^2.1.0
     serialize-javascript: ^6.0.0
     supertest: 3.4.2
+    tmp: ^0.2.1
     tus-js-client: 2.1.1
     typescript: ~4.4
     uuid: 8.1.0
     validator: ^12.1.0
     ws: 6.2.2
+    youtube-dl-exec: ^2.4.4
   bin:
     companion: ./bin/companion
   languageName: unknown
@@ -9825,6 +9828,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"acorn@npm:^8.5.0":
+  version: 8.8.2
+  resolution: "acorn@npm:8.8.2"
+  bin:
+    acorn: bin/acorn
+  checksum: f790b99a1bf63ef160c967e23c46feea7787e531292bb827126334612c234ed489a0dc2c7ba33156416f0ffa8d25bf2b0fdb7f35c2ba60eb3e960572bece4001
+  languageName: node
+  linkType: hard
+
 "address@npm:1.1.2, address@npm:^1.0.1, address@npm:^1.1.2":
   version: 1.1.2
   resolution: "address@npm:1.1.2"
@@ -11356,7 +11368,7 @@ __metadata:
 
 "babel-plugin-transform-commonjs@patch:babel-plugin-transform-commonjs@npm:1.1.6#.yarn/patches/babel-plugin-transform-commonjs-npm-1.1.6-0007fa2809::locator=%40uppy-dev%2Fbuild%40workspace%3A.":
   version: 1.1.6
-  resolution: "babel-plugin-transform-commonjs@patch:babel-plugin-transform-commonjs@npm%3A1.1.6#.yarn/patches/babel-plugin-transform-commonjs-npm-1.1.6-0007fa2809::version=1.1.6&hash=f83dbd&locator=%40uppy-dev%2Fbuild%40workspace%3A."
+  resolution: "babel-plugin-transform-commonjs@patch:babel-plugin-transform-commonjs@npm%3A1.1.6#.yarn/patches/babel-plugin-transform-commonjs-npm-1.1.6-0007fa2809::version=1.1.6&hash=61e4ef&locator=%40uppy-dev%2Fbuild%40workspace%3A."
   dependencies:
     "@babel/helper-plugin-utils": ^7.0.0
   peerDependencies:
@@ -11686,6 +11698,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bin-version-check@npm:~5.0.0":
+  version: 5.0.0
+  resolution: "bin-version-check@npm:5.0.0"
+  dependencies:
+    bin-version: ^6.0.0
+    semver: ^7.3.5
+    semver-truncate: ^2.0.0
+  checksum: 1d3dc92847f8ecd5e07109f5f44727f0cb3b17c00be5ae2a2e105b86bf161bc4e5c10ee2e2c21d5d28e6382994d8416b5e06048191a485be909a1e49a959c3c3
+  languageName: node
+  linkType: hard
+
 "bin-version@npm:^3.0.0":
   version: 3.1.0
   resolution: "bin-version@npm:3.1.0"
@@ -11693,6 +11716,16 @@ __metadata:
     execa: ^1.0.0
     find-versions: ^3.0.0
   checksum: 59ef7194420fc30f3a4ea8ce569ad11f7eb736019ca765778739f14702faf2b23b3bcf757e0d29b3839c14bcca9dc38c10c083d3d601363ef06436424204579d
+  languageName: node
+  linkType: hard
+
+"bin-version@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "bin-version@npm:6.0.0"
+  dependencies:
+    execa: ^5.0.0
+    find-versions: ^5.0.0
+  checksum: 78c29422ea9597eb4c8d4f0eff96df60d09aa82b53a87925bc403efbe5c55251b1a07baac538381d9096377f92d27e3c03963efa86db5bc0d6431b9563946229
   languageName: node
   linkType: hard
 
@@ -15254,6 +15287,13 @@ __metadata:
   version: 1.0.7
   resolution: "damerau-levenshtein@npm:1.0.7"
   checksum: ec8161cb381523e0db9b5c9b64863736da3197808b6fdc4a3a2ca764c0b4357e9232a4c5592220fb18755a91240b8fee7b13ab1b269fbbdc5f68c36f0053aceb
+  languageName: node
+  linkType: hard
+
+"dargs@npm:~7.0.0":
+  version: 7.0.0
+  resolution: "dargs@npm:7.0.0"
+  checksum: b8f1e3cba59c42e1f13a114ad4848c3fc1cf7470f633ee9e9f1043762429bc97d91ae31b826fb135eefde203a3fdb20deb0c0a0222ac29d937b8046085d668d1
   languageName: node
   linkType: hard
 
@@ -18823,7 +18863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"execa@npm:^5.0.0, execa@npm:^5.1.1":
+"execa@npm:^5.0.0, execa@npm:^5.1.1, execa@npm:~5.1.0":
   version: 5.1.1
   resolution: "execa@npm:5.1.1"
   dependencies:
@@ -19931,6 +19971,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"find-versions@npm:^5.0.0":
+  version: 5.1.0
+  resolution: "find-versions@npm:5.1.0"
+  dependencies:
+    semver-regex: ^4.0.5
+  checksum: 680bdb0081f631f7bfb6f0f8edcfa0b74ab8cabc82097a4527a37b0d042aabc56685bf459ff27991eab0baddc04eb8e3bba8a2869f5004ecf7cdd2779b6e51de
+  languageName: node
+  linkType: hard
+
 "flat-cache@npm:^2.0.1":
   version: 2.0.1
   resolution: "flat-cache@npm:2.0.1"
@@ -20408,7 +20457,7 @@ __metadata:
 
 "fsevents@patch:fsevents@^1.2.7#~builtin<compat/fsevents>":
   version: 1.2.13
-  resolution: "fsevents@patch:fsevents@npm%3A1.2.13#~builtin<compat/fsevents>::version=1.2.13&hash=18f3a7"
+  resolution: "fsevents@patch:fsevents@npm%3A1.2.13#~builtin<compat/fsevents>::version=1.2.13&hash=d11327"
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
@@ -20418,7 +20467,7 @@ __metadata:
 
 "fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
   version: 2.3.2
-  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"
   dependencies:
     node-gyp: latest
   conditions: os=darwin
@@ -21233,6 +21282,15 @@ __metadata:
   version: 1.0.4
   resolution: "grapheme-splitter@npm:1.0.4"
   checksum: 0c22ec54dee1b05cd480f78cf14f732cb5b108edc073572c4ec205df4cd63f30f8db8025afc5debc8835a8ddeacf648a1c7992fe3dcd6ad38f9a476d84906620
+  languageName: node
+  linkType: hard
+
+"growing-file@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "growing-file@npm:0.1.3"
+  dependencies:
+    oop: 0.0.3
+  checksum: f3c826ccd24dd2c839260126eff23718e671556fb0a9a995db5b95fcf2581156e0a3023333e89b7c11edb44e17274358828a14d390df73df1edbb4b41aa95fe4
   languageName: node
   linkType: hard
 
@@ -23956,6 +24014,13 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
   version: 0.1.0
   resolution: "is-unicode-supported@npm:0.1.0"
   checksum: a2aab86ee7712f5c2f999180daaba5f361bdad1efadc9610ff5b8ab5495b86e4f627839d085c6530363c6d6d4ecbde340fb8e54bdb83da4ba8e0865ed5513c52
+  languageName: node
+  linkType: hard
+
+"is-unix@npm:~2.0.1":
+  version: 2.0.7
+  resolution: "is-unix@npm:2.0.7"
+  checksum: 85c4177e8adab3a46c55b0a31f88fc8a942423b905c0af2232e675f6d1bffbb3cbfec93206e17542a887629fe774efb95b7131b59327c36fd82c374b22bb37bf
   languageName: node
   linkType: hard
 
@@ -29582,7 +29647,7 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
 
 "npm-auth-to-token@patch:npm-auth-to-token@npm:1.0.0#.yarn/patches/npm-auth-to-token-npm-1.0.0-c288ce201f::locator=%40uppy-dev%2Fbuild%40workspace%3A.":
   version: 1.0.0
-  resolution: "npm-auth-to-token@patch:npm-auth-to-token@npm%3A1.0.0#.yarn/patches/npm-auth-to-token-npm-1.0.0-c288ce201f::version=1.0.0&hash=1a3182&locator=%40uppy-dev%2Fbuild%40workspace%3A."
+  resolution: "npm-auth-to-token@patch:npm-auth-to-token@npm%3A1.0.0#.yarn/patches/npm-auth-to-token-npm-1.0.0-c288ce201f::version=1.0.0&hash=4b3857&locator=%40uppy-dev%2Fbuild%40workspace%3A."
   dependencies:
     commander: ^2.9.0
     npm-registry-client: ^8.3.0
@@ -30131,6 +30196,13 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
   version: 0.0.2
   resolution: "only@npm:0.0.2"
   checksum: d399710db867a1ef436dd3ce74499c87ece794aa81ab0370b5d153968766ee4aed2f98d3f92fc87c963e45b7a74d400d6f463ef651a5e7cfb861b15e88e9efe6
+  languageName: node
+  linkType: hard
+
+"oop@npm:0.0.3":
+  version: 0.0.3
+  resolution: "oop@npm:0.0.3"
+  checksum: 7436b1d0d170c0a29a95971f2c08a6cb1d1c0b0c4578a369c76bffae661b1636511d5793f813b9fe83b9d4084e2ca97aee8734aa2134dcad412648f91601d88d
   languageName: node
   linkType: hard
 
@@ -35530,7 +35602,7 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
 
 "resolve@patch:resolve@1.20.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.1.4#~builtin<compat/resolve>, resolve@patch:resolve@^1.1.6#~builtin<compat/resolve>, resolve@patch:resolve@^1.1.7#~builtin<compat/resolve>, resolve@patch:resolve@^1.10.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.10.1#~builtin<compat/resolve>, resolve@patch:resolve@^1.11.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.13.1#~builtin<compat/resolve>, resolve@patch:resolve@^1.14.2#~builtin<compat/resolve>, resolve@patch:resolve@^1.17.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.19.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.20.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.3.2#~builtin<compat/resolve>, resolve@patch:resolve@^1.4.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.5.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.8.1#~builtin<compat/resolve>":
   version: 1.20.0
-  resolution: "resolve@patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=07638b"
+  resolution: "resolve@patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=c3c19d"
   dependencies:
     is-core-module: ^2.2.0
     path-parse: ^1.0.6
@@ -35540,7 +35612,7 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
 
 "resolve@patch:resolve@^2.0.0-next.3#~builtin<compat/resolve>":
   version: 2.0.0-next.3
-  resolution: "resolve@patch:resolve@npm%3A2.0.0-next.3#~builtin<compat/resolve>::version=2.0.0-next.3&hash=07638b"
+  resolution: "resolve@patch:resolve@npm%3A2.0.0-next.3#~builtin<compat/resolve>::version=2.0.0-next.3&hash=c3c19d"
   dependencies:
     is-core-module: ^2.2.0
     path-parse: ^1.0.6
@@ -36474,12 +36546,28 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
   languageName: node
   linkType: hard
 
+"semver-regex@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "semver-regex@npm:4.0.5"
+  checksum: b9e5c0573c4a997fb7e6e76321385d254797e86c8dba5e23f3cd8cf8f40b40414097a51514e5fead61dcb88ff10d3676355c01e2040f3c68f6c24bfd2073da2e
+  languageName: node
+  linkType: hard
+
 "semver-truncate@npm:^1.1.2":
   version: 1.1.2
   resolution: "semver-truncate@npm:1.1.2"
   dependencies:
     semver: ^5.3.0
   checksum: a4583b535184530bdc39cec9f572081a5c2c70b434150f5c2f6eb4177f69cc94f395abb0d995e15c4b0a2cdb2069f3804a38129735367dba86ba250cdcced4dc
+  languageName: node
+  linkType: hard
+
+"semver-truncate@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "semver-truncate@npm:2.0.0"
+  dependencies:
+    semver: ^6.0.0
+  checksum: 713c2bd49add098c3fd6271091e7c8c13908ab3f052d58a19b68920da9f101d34eb6a0c60ef4bd5fa3c345f001e0df37bb831602082441bb35ba857cac42e0f4
   languageName: node
   linkType: hard
 
@@ -36907,6 +36995,17 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
   version: 1.0.1
   resolution: "simple-concat@npm:1.0.1"
   checksum: 4d211042cc3d73a718c21ac6c4e7d7a0363e184be6a5ad25c8a1502e49df6d0a0253979e3d50dbdd3f60ef6c6c58d756b5d66ac1e05cda9cacd2e9fc59e3876a
+  languageName: node
+  linkType: hard
+
+"simple-get@npm:~4.0.1":
+  version: 4.0.1
+  resolution: "simple-get@npm:4.0.1"
+  dependencies:
+    decompress-response: ^6.0.0
+    once: ^1.3.1
+    simple-concat: ^1.0.0
+  checksum: e4132fd27cf7af230d853fa45c1b8ce900cb430dd0a3c6d3829649fe4f2b26574c803698076c4006450efb0fad2ba8c5455fbb5755d4b0a5ec42d4f12b31d27e
   languageName: node
   linkType: hard
 
@@ -40243,21 +40342,21 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
 
 "typescript@patch:typescript@*#~builtin<compat/typescript>":
   version: 4.5.2
-  resolution: "typescript@patch:typescript@npm%3A4.5.2#~builtin<compat/typescript>::version=4.5.2&hash=ddd1e8"
+  resolution: "typescript@patch:typescript@npm%3A4.5.2#~builtin<compat/typescript>::version=4.5.2&hash=bcec9a"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 24a439e062a05e3285a4f0e8a40644116ecdca89f3e908bed01e5a01b9aee747e3bcf0e85fe9e017e5ebf0c0863437c39479f2616f55a244c2d82d37022cdc4f
+  checksum: e25e689eba64f7da7cfc43f8ea76cac7176b56caba42655f0a4cb29c0b7c36e67ca54f33df95902859f56108464245d8b45bcdfe21e3d66d9560feb8db780246
   languageName: node
   linkType: hard
 
 "typescript@patch:typescript@~4.4#~builtin<compat/typescript>":
   version: 4.4.4
-  resolution: "typescript@patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8"
+  resolution: "typescript@patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=bbeadb"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: bd629ad0da4a15d79aaad56baf3ee7d96f6a181760d430ae77f8c5325df7bffd9edee57544a3970e3651e8b796fe03a5838a7eb39c6d46cc3866c0b23d36a0dd
+  checksum: 3d1b04449662193544b81d055479d03b4c5dca95f1a82f8922596f089d894c9fefbe16639d1d9dfe26a7054419645530cef44001bc17aed1fe1eb3c237e9b3c7
   languageName: node
   linkType: hard
 
@@ -43523,6 +43622,19 @@ hexo-filter-github-emojis@arturi/hexo-filter-github-emojis:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: f77b3d8d00310def622123df93d4ee654fc6a0096182af8bd60679ddcdfb3474c56c6c7190817c84a2785648cdee9d721c0154eb45698c62176c322fb46fc700
+  languageName: node
+  linkType: hard
+
+"youtube-dl-exec@npm:^2.4.4":
+  version: 2.4.4
+  resolution: "youtube-dl-exec@npm:2.4.4"
+  dependencies:
+    bin-version-check: ~5.0.0
+    dargs: ~7.0.0
+    execa: ~5.1.0
+    is-unix: ~2.0.1
+    simple-get: ~4.0.1
+  checksum: 2595611cf0e139c20abb35d31789522dc64ca2e5ae216cd1d23b96ab0c86912aaa726a47cc443da4ee5158778f165c873fbb5f92565455d35b1ec9cbf3bb8d6f
   languageName: node
   linkType: hard
 
