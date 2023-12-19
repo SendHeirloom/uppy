@@ -16,9 +16,6 @@ function streamFile (url, isAudio, output) {
     maxFilesize: '10G',
     noPlaylist: true,
     retries: 1,
-
-    // fix HTTP 403? likely only temporarily / will still need proxy...
-    forceIpv4: true,
   }, {
     timeout: TIMEOUT,
   })
