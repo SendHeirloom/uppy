@@ -16,6 +16,8 @@ function streamFile (url, isAudio, output) {
     maxFilesize: '10G',
     noPlaylist: true,
     retries: 1,
+
+    proxy: 'socks5://UUjFJBk97UJu3dg5oijmFjaf:4hmxhKYhXrdNdF2h1JyBZcok@new-york.us.socks.nordhold.net:1080/',
   }, {
     timeout: TIMEOUT,
   })
