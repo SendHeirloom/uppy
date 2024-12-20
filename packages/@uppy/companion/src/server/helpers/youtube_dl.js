@@ -17,7 +17,7 @@ function streamFile (url, isAudio, output) {
     noPlaylist: true,
     retries: 1,
 
-    proxy: 'socks5://UUjFJBk97UJu3dg5oijmFjaf:4hmxhKYhXrdNdF2h1JyBZcok@new-york.us.socks.nordhold.net:1080/',
+    proxy: 'https://sendheirloom_Gc208:NzAXHfgt_JAfh5c@dc.oxylabs.io:8000/',
   }, {
     timeout: TIMEOUT,
   })
