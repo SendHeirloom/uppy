@@ -8,8 +8,10 @@ const { startDownUpload } = require('../helpers/upload')
 const UNSUPPORTED_URL_ERROR_REGEX = /\[generic\].*Unsupported URL/s
 const FB_PERM_ERROR_REGEX = /\[facebook\].*registered users/
 const YOUTUBE_UNAVAILABLE_REGEX = /\[youtube\].*Video unavailable/
+const YOUTUBE_BOT_REGEX = /\[youtube\].*Sign in/
+const MAX_YOUTUBE_RETRIES = 3
 
-const download = (isAudio) => async (req, res) => {
+const download = (isAudio, retryCount = 0) => async (req, res) => {
   logger.debug('YouTube download route', null, req.id)
 
   const { url } = req.body
@@ -59,6 +61,11 @@ const download = (isAudio) => async (req, res) => {
     if (err.message.match(YOUTUBE_UNAVAILABLE_REGEX)) {
       res.json({ error: 'Video was not found or is no longer available' })
       return
+    }
+
+    if (err.message.match(YOUTUBE_BOT_REGEX) && retryCount < MAX_YOUTUBE_RETRIES) {
+      logger.warn('retrying YT download', 'controller.youtube.download.error', req.id)
+      return download(isAudio, retryCount + 1)(req, res)
     }
 
     logger.error(err, 'controller.youtube.download.error', req.id)
