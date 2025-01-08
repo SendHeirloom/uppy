@@ -17,7 +17,8 @@ function streamFile (url, isAudio, output) {
     noPlaylist: true,
     retries: 1,
 
-    proxy: 'https://sendheirloom_Gc208:NzAXHfgt_JAfh5c@dc.oxylabs.io:8000/',
+    // proxy: 'https://sendheirloom_Gc208:NzAXHfgt_JAfh5c@dc.oxylabs.io:8000/',
+    cookies: '~/uppy/cookies.txt',
   }, {
     timeout: TIMEOUT,
   })
