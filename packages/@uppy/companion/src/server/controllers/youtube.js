@@ -65,6 +65,7 @@ const download = (isAudio, retryCount = 0) => async (req, res) => {
 
     if (err.message.match(YOUTUBE_BOT_REGEX) && retryCount < MAX_YOUTUBE_RETRIES) {
       logger.warn('retrying YT download', 'controller.youtube.download.error', req.id)
+      watcher.close()
       return download(isAudio, retryCount + 1)(req, res)
     }
 
