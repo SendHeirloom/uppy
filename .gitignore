@@ -47,3 +47,6 @@ transloadit-cluster-kubeconfig.yaml
 companion-env.yml
 
 run
+
+# this gets changed during runtime, so it should be manually updated when tokens expire
+packages/@uppy/companion/cookies.txt
