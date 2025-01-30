@@ -8,7 +8,7 @@ const { startDownUpload } = require('../helpers/upload')
 const UNSUPPORTED_URL_ERROR_REGEX = /\[generic\].*Unsupported URL/s
 const FB_PERM_ERROR_REGEX = /\[facebook\].*registered users/
 const YOUTUBE_UNAVAILABLE_REGEX = /\[youtube\].*Video unavailable/
-const YOUTUBE_BOT_REGEX = /\[youtube\].*Sign in/
+const YOUTUBE_BOT_REGEX = /(403: Forbidden.*\[youtube\])|(\[youtube\].*Sign in)/s
 const MAX_YOUTUBE_RETRIES = 3
 
 const download = (isAudio, retryCount = 0) => async (req, res) => {
